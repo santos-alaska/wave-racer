@@ -280,7 +280,7 @@ export class Hud implements HudAPI {
 
     const readout = slantPath(rx, ry, rw, rh, rh * PLATE_SKEW);
     plate(g, readout, s, { hatchRect: [rx, ry, rw, rh] });
-    inkText(g, 'SPEED', rx + 18 * s, ry + 21 * s, {
+    inkText(g, 'ACCELERATE', rx + 18 * s, ry + 21 * s, {
       font: `800 ${Math.round(11 * s)}px ${FONT_STACK}`,
       fill: rgba(HEX.hudDim, 1),
       align: 'left',
