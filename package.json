@@ -1,0 +1,23 @@
+{
+  "name": "ink-tide",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Ink Tide — a cel-shaded arcade boat racing game on an infinite procedural ocean.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 4173 --strictPort",
+    "typecheck": "tsc --noEmit",
+    "shots": "node harness/capture.mjs"
+  },
+  "dependencies": {
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "@types/three": "^0.185.1",
+    "playwright": "^1.62.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.11"
+  }
+}
