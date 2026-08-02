@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: wave-racer-container
-        image: nwachukwuchukwuka123/wave-racer:latest
+        image: nwachukwuchukwuka123/wave-racer:build-1
         imagePullPolicy: Always
         ports:
         - containerPort: 80
