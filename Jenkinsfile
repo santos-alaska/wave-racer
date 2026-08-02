@@ -20,7 +20,10 @@ pipeline {
         }
 
         stage('Build and Push Image') {
-            when { branch 'main' }
+            when {
+                branch 'main'
+            }
+
             steps {
                 script {
                     env.IMAGE_TAG = "build-${BUILD_NUMBER}"
@@ -32,7 +35,10 @@ pipeline {
                     )]) {
                         sh """
                         docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+
+                        echo "\$DOCKER_PASS" | \
+                        docker login -u "\$DOCKER_USER" --password-stdin
+
                         docker push ${IMAGE_NAME}:${IMAGE_TAG}
                         """
                     }
@@ -40,8 +46,37 @@ pipeline {
             }
         }
 
+        stage('Run in Docker') {
+            when {
+                branch 'main'
+            }
+
+            steps {
+                sh """
+                # Stop the old container if it is running
+                docker stop wave-racer-container || true
+
+                # Remove the old container if it exists
+                docker rm wave-racer-container || true
+
+                # Pull the newly pushed image
+                docker pull ${IMAGE_NAME}:${IMAGE_TAG}
+
+                # Run the new container
+                docker run -d \
+                    --name wave-racer-container \
+                    -p 3000:80 \
+                    --restart unless-stopped \
+                    ${IMAGE_NAME}:${IMAGE_TAG}
+                """
+            }
+        }
+
         stage('Update K8s Manifest') {
-            when { branch 'main' }
+            when {
+                branch 'main'
+            }
+
             steps {
                 script {
                     withCredentials([usernamePassword(
@@ -51,6 +86,7 @@ pipeline {
                     )]) {
                         sh """
                         set -e
+
                         git config user.name "$GIT_USER"
                         git config user.email "$GIT_EMAIL"
 
@@ -58,11 +94,18 @@ pipeline {
                         git checkout main
                         git reset --hard origin/main
 
-                        sed -i "s|image:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|" k8s/deployment.yml
+                        sed -i \
+                        "s|image:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|" \
+                        k8s/deployment.yml
 
                         git add k8s/deployment.yml
-                        git diff --cached --quiet || git commit -m "Updated image to ${IMAGE_TAG}"
-                        git push https://${GIT_USERNAME}:${GIT_TOKEN}@github.com/santos-alaska/wave-racer.git main
+
+                        git diff --cached --quiet || \
+                        git commit -m "Updated image to ${IMAGE_TAG}"
+
+                        git push \
+                        https://\$GIT_USERNAME:\$GIT_TOKEN@github.com/santos-alaska/wave-racer.git \
+                        main
                         """
                     }
                 }
