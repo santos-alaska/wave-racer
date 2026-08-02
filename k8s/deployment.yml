@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wave-racer-app
+  labels:
+    app: wave-racer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: wave-racer
+  template:
+    metadata:
+      labels:
+        app: wave-racer
+    spec:
+      containers:
+      - name: wave-racer-container
+        image: nwachukwuchukwuka123/wave-racer:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
