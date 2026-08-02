@@ -65,7 +65,7 @@ pipeline {
                 # Run the new container
                 docker run -d \
                     --name wave-racer-container \
-                    -p 8080:80 \
+                    -p 3000:80 \
                     --restart unless-stopped \
                     ${IMAGE_NAME}:${IMAGE_TAG}
                 """
